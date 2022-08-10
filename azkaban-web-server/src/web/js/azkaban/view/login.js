@@ -44,12 +44,12 @@ azkaban.LoginView = Backbone.View.extend({
         username: username,
         userpwd: userpwd
       },
-      success: function (data) {
+      success: function (data, textStatus, jqXHR) {
         if (data.error) {
           $('#error-msg').text(data.error);
           $('#error-msg').slideDown('fast');
-        }
-        else {
+        } else {
+          localStorage.setItem('csrfToken', jqXHR.getResponseHeader("csrfToken"));
           document.location.reload();
         }
       }

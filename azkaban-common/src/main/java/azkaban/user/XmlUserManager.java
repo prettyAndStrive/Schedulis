@@ -354,4 +354,9 @@ public class XmlUserManager implements UserManager {
       return false;
     }
   }
+
+  @Override
+  public User validateOpsUser(String username, String password, String normalUserName, String normalPassword) throws UserManagerException {
+    return null;
+  }
 }
