@@ -76,7 +76,7 @@ public class SystemUserManager implements UserManager {
         if (null != wtssUser){
           wtssUser.setPassword(password);
         } else {
-          throw new UserManagerException("Unknown User.");
+          throw new UserManagerException("Error User Name Or Password.");
         }
 
         boolean ldapSwitch = props.getBoolean("ladp.switch", false);
@@ -159,7 +159,7 @@ public class SystemUserManager implements UserManager {
           user = new User(wtssUser.getUsername());
           wtssUser.setPassword("");
         } else {
-          throw new UserManagerException("Unknown User.");
+          throw new UserManagerException("Error User Name Or Password.");
         }
         initUserAuthority(wtssUser, user);
       } catch (Exception e) {
