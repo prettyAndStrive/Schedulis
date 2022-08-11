@@ -32,7 +32,7 @@ azkaban.LoginView = Backbone.View.extend({
     //var username = $.base64.decode($("#username").val());
     //var userpwd = $.base64.decode($("#userpwd").val());
     var username = $("#username").val();
-    var userpwd = $("#userpwd").val();
+    var userpwd = this.encrypt($("#userpwd").val());
 
     $.ajax({
       async: "false",
@@ -55,6 +55,22 @@ azkaban.LoginView = Backbone.View.extend({
       }
     });
   },
+
+  encrypt: function(str){
+      var encrypt = new JSEncrypt();
+      encrypt.setPublicKey('-----BEGIN PUBLIC KEY-----' + $("#publicKey").val() + '-----END PUBLIC KEY-----');
+      return this.base64toHEX(encrypt.encrypt(str));
+    },
+
+    base64toHEX: function(base64) {
+      var raw = atob(base64);
+      var HEX = '';
+      for (var i = 0; i < raw.length; i++) {
+        var _hex = raw.charCodeAt(i).toString(16)
+        HEX += (_hex.length == 2? _hex: '0' + _hex);
+      }
+      return HEX;
+    },
 
   handleKeyPress: function (evt) {
     if (evt.charCode == 13 || evt.keyCode == 13) {

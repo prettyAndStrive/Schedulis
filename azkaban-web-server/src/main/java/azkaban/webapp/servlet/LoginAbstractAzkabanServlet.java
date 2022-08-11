@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static azkaban.ServiceProvider.SERVICE_PROVIDER;
+import static azkaban.Constants.WTSS_PUBLIC_KEY;
 
 /**
  * Abstract Servlet that handles auto login when the session hasn't been verified.
@@ -376,6 +377,7 @@ public abstract class LoginAbstractAzkabanServlet extends AbstractAzkabanServlet
         subPageMap1.forEach(page::add);
 
         page.add("passwordPlaceholder", this.passwordPlaceholder);
+        page.add("publicKey", getApplication().getServerProps().get(WTSS_PUBLIC_KEY));
         if (errorMsg != null) {
             page.add("errorMsg", errorMsg);
         }

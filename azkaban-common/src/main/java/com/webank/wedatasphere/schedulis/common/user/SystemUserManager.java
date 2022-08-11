@@ -18,12 +18,10 @@ package com.webank.wedatasphere.schedulis.common.user;
 
 import azkaban.ServiceProvider;
 import azkaban.user.*;
-import azkaban.utils.EncryptUtil;
 import azkaban.utils.Props;
 import com.webank.wedatasphere.schedulis.common.system.JdbcSystemUserImpl;
 import com.webank.wedatasphere.schedulis.common.system.SystemUserLoader;
 import com.webank.wedatasphere.schedulis.common.system.SystemUserManagerException;
-import com.webank.wedatasphere.schedulis.common.system.entity.DepartmentMaintainer;
 import com.webank.wedatasphere.schedulis.common.system.entity.WtssPermissions;
 import com.webank.wedatasphere.schedulis.common.system.entity.WtssRole;
 import com.webank.wedatasphere.schedulis.common.system.entity.WtssUser;
@@ -262,71 +260,6 @@ public class SystemUserManager implements UserManager {
     }
   }
 
-  @Override
-  public User validateOpsUser(String username, String password, String normalUserName, String normalPassword) throws UserManagerException {
-    //运维用户名密码判空
-    if (username == null || username.trim().isEmpty()) {
-      throw new UserManagerException("Empty Ops User Name.");
-    }
-
-    User user = validateUserPassword(username, password, " Ops ", true);
-
-    //普通用户名密码判空
-    if (normalUserName == null || normalUserName.trim().isEmpty()) {
-      throw new UserManagerException("Empty Normal User Name.");
-    }
-    //普通用户密码解码并判空
-    try {
-      String passwordPrivateKey = props.getString("password.private.key");
-      normalPassword = EncryptUtil.decrypt(passwordPrivateKey, normalPassword);
-    } catch (Exception e) {
-      logger.error("decrypt normal user password failed.", e);
-      throw new UserManagerException("decrypt normal user password failed.");
-    }
-    if (normalPassword == null || normalPassword.trim().isEmpty()) {
-      throw new UserManagerException("Empty Normal User Password.");
-    }
-
-    //校验普通用户密码是否正确
-    validateUserPassword(normalUserName, normalPassword, " Normal ", false);
-    //校验实名用户是否为运维人员，并且与运维用户同部门
-    if (props.getBoolean("wtss.opsuser.department.check", true)) {
-      try {
-        WtssUser opsUser = systemUserLoader.getWtssUserByUsername(username);
-        if (opsUser == null) {
-          throw new UserManagerException("Unknown Ops User.");
-        }
-        //查询运维用户所属部门运维人员
-        DepartmentMaintainer maintainer = systemUserLoader.getDepMaintainerByDepId(opsUser.getDepartmentId());
-        if (maintainer == null || StringUtils.isEmpty(maintainer.getOpsUser())) {
-          throw new UserManagerException("opsuser's department has not maintainer.");
-        }
-        //校验该部门运维人员是否包含实名用户
-        String[] opsUserArr = maintainer.getOpsUser().split(",|，");
-        boolean isMaintainer = false;
-        for (int i = 0; i < opsUserArr.length; i++) {
-          if (normalUserName.equals(opsUserArr[i])) {
-            isMaintainer = true;
-            break;
-          }
-        }
-        if (!isMaintainer) {
-          throw new UserManagerException("the normal user is not maintainer of opsuser's department.");
-        }
-
-      } catch (Exception e) {
-        if (e instanceof UserManagerException) {
-          throw new UserManagerException(e.getMessage());
-        } else {
-          throw new UserManagerException("Check Normal User Department Error.");
-        }
-      }
-    }
-
-    //校验通过，设置普通用户
-    user.setNormalUser(normalUserName);
-    return user;
-  }
 
   private User validateUserPassword(String UserName, String Password, String prefix, boolean isGetAuth) throws UserManagerException {
     synchronized (this) {
