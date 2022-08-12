@@ -591,6 +591,10 @@ public abstract class LoginAbstractAzkabanServlet extends AbstractAzkabanServlet
             throws UserManagerException, ServletException, IOException {
         final String username = getParam(req, "username");
         String password = getParam(req, "userpwd");
+        String frompage = "";
+        if(hasParam(req, "frompage")){
+            frompage = getParam(req, "frompage");
+        }
 
         final Props props = this.application.getServerProps();
 
@@ -650,6 +654,15 @@ public abstract class LoginAbstractAzkabanServlet extends AbstractAzkabanServlet
         } catch (final Exception e) {
             logger.error("no super user", e);
             //没有超级用户，直接ignore
+        }
+        if("true".equals(frompage)){
+            try {
+                String passwordPrivateKey = props.getString("password.private.key");
+                password = RSAUtils.decrypt(passwordPrivateKey, password);
+            } catch (Exception e) {
+                logger.error("decrypt password failed.", e);
+                throw new UserManagerException("decrypt password failed.");
+            }
         }
         return createSession(username, password, ip, req);
     }

@@ -24,7 +24,7 @@
   #parse("azkaban/webapp/servlet/velocity/javascript.vm")
 
   <script type="text/javascript" src="${context}/js/azkaban/view/login.js?version=1.10.0"></script>
-  <script type="text/javascript" src="${context}/js/jsencrypt.min.js?version=1.17.0"></script>
+  <script type="text/javascript" src="${context}/js/jsencrypt.min.js?version=1.18.0"></script>
   <script type="text/javascript">
     var contextURL = "${context}";
     var langType = "${currentlangType}";

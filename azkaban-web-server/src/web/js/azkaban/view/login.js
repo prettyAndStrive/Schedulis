@@ -33,6 +33,7 @@ azkaban.LoginView = Backbone.View.extend({
     //var userpwd = $.base64.decode($("#userpwd").val());
     var username = $("#username").val();
     var userpwd = this.encrypt($("#userpwd").val());
+    var frompage = true;
 
     $.ajax({
       async: "false",
@@ -42,7 +43,8 @@ azkaban.LoginView = Backbone.View.extend({
       data: {
         action: "login",
         username: username,
-        userpwd: userpwd
+        userpwd: userpwd,
+        frompage: frompage
       },
       success: function (data, textStatus, jqXHR) {
         if (data.error) {
@@ -56,18 +58,18 @@ azkaban.LoginView = Backbone.View.extend({
     });
   },
 
-  encrypt: function(str){
+  encrypt: function (str) {
       var encrypt = new JSEncrypt();
       encrypt.setPublicKey('-----BEGIN PUBLIC KEY-----' + $("#publicKey").val() + '-----END PUBLIC KEY-----');
       return this.base64toHEX(encrypt.encrypt(str));
     },
 
-    base64toHEX: function(base64) {
-      var raw = atob(base64);
+    base64toHEX: function (base64) {
+      var raw = decodeURIComponent(escape(atob(base64)));
       var HEX = '';
       for (var i = 0; i < raw.length; i++) {
         var _hex = raw.charCodeAt(i).toString(16)
-        HEX += (_hex.length == 2? _hex: '0' + _hex);
+        HEX += (_hex.length == 2 ? _hex : '0' + _hex);
       }
       return HEX;
     },
